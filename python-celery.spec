@@ -32,7 +32,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %setup -q -n %{module}-%{version}
 
 # fix #!/usr/bin/env python -> #!/usr/bin/python:
-%{__sed} -i -e '1s,^#!.*python,#!%{__python},' %{name}.py
+# %{__sed} -i -e '1s,^#!.*python,#!%{__python},' %{name}.py
 
 %build
 # CC/CFLAGS is only for arch packages - remove on noarch packages
