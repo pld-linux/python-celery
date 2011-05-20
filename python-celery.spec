@@ -60,11 +60,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS CREDITS ChangeLog NEWS README THANKS TODO
-# change %{py_sitedir} to %{py_sitescriptdir} for 'noarch' packages!
-%{py_sitedir}/*.py[co]
-%attr(755,root,root) %{py_sitedir}/*.so
-%if "%{py_ver}" > "2.4"
-%{py_sitedir}/TEMPLATE-*.egg-info
-%endif
-%{_examplesdir}/%{name}-%{version}
+%doc AUTHORS README* THANKS TODO
+%{_bindir}/*
+%attr(644, root, root) /usr/share/python2.7/*
