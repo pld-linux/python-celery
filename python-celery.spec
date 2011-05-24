@@ -59,7 +59,7 @@ EOF
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-%useradd -u 300 -r -s /bin/fafse "celery user" celery
+%useradd -u 300 -g users -r -s /bin/fafse "celery user" celery
 
 %preun
 /etc/init.d/rc.d/%{name}d stop
