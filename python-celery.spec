@@ -34,10 +34,41 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
+install -d $RPM_BUILD_ROOT/etc/{sysconfig,rc.d/init.d}
+cp -a contrib/generic-init.d/* $RPM_BUILD_ROOT/etc/rc.d/init.d/
+
+cat > $RPM_BUILD_ROOT/etc/sysconfig/celeryd << EOF
+#   # List of nodes to start
+#   CELERYD_NODES="worker1 worker2 worker3"k
+#   # ... can also be a number of workers
+#   CELERYD_NODES=3
+#
+#   # Where to chdir at start.
+#   CELERYD_CHDIR="/opt/Myproject/"
+#
+#   # Extra arguments to celeryd
+#   CELERYD_OPTS="--time-limit=300"
+#
+#   # Name of the celery config module.#
+#   CELERY_CONFIG_MODULE="celeryconfig"
+EOF
+
 %py_postclean
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+%pre
+%useradd -u 1111 -r -s /bin/fafse "celery user" celery
+
+%preun
+/etc/init.d/rc.d/%{name}d stop
+
+%post
+echo "Use: \"/etc/init.d/rc.d/%{name}d start\" to start celry."
+
+%postun
+%userremove celery
 
 %files
 %defattr(644,root,root,755)
@@ -48,6 +79,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/celeryd
 %attr(755,root,root) %{_bindir}/celeryd-multi
 %attr(755,root,root) %{_bindir}/celeryev
+
+%attr(744,root,root) /etc/rc.d/init.d/*
+%attr(644,root,root) /etc/sysconfig/*
+
 %{py_sitescriptdir}/%{module}
 %if "%{py_ver}" > "2.4"
 %{py_sitescriptdir}/celery-*.egg-info
