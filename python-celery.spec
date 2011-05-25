@@ -13,6 +13,10 @@ BuildRequires:	python-distribute
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.219
 Requires:	python-modules
+Requires:	python-kombu
+Requires:	python-anyjson
+Requires:	python-dateutil < 2.0.0
+Requires:	python-amqplib
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
