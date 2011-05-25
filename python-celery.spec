@@ -40,8 +40,11 @@ cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
 install -d $RPM_BUILD_ROOT/etc/{sysconfig,rc.d/init.d}
 cp -a contrib/generic-init.d/celeryd $RPM_BUILD_ROOT/etc/rc.d/init.d/
+
+## fixed path to celeryd configuration file.
 sed -i 's/default/sysconfig/' $RPM_BUILD_ROOT/etc/rc.d/init.d/celeryd
 
+## creating dummy celeryd config file
 cat > $RPM_BUILD_ROOT/etc/sysconfig/celeryd << EOF
 #   # List of nodes to start
 #   CELERYD_NODES="worker1 worker2 worker3"k
