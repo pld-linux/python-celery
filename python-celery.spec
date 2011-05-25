@@ -3,7 +3,7 @@ Summary:	Distributed Task Query
 Summary(pl.UTF-8):	-
 Name:		python-%{module}
 Version:	2.2.6
-Release:	0.2
+Release:	0.3
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
@@ -39,7 +39,8 @@ install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
 install -d $RPM_BUILD_ROOT/etc/{sysconfig,rc.d/init.d}
-cp -a contrib/generic-init.d/* $RPM_BUILD_ROOT/etc/rc.d/init.d/
+cp -a contrib/generic-init.d/celeryd $RPM_BUILD_ROOT/etc/rc.d/init.d/
+sed -i 's/default/sysconfig/' $RPM_BUILD_ROOT/etc/rc.d/init.d/celeryd
 
 cat > $RPM_BUILD_ROOT/etc/sysconfig/celeryd << EOF
 #   # List of nodes to start
@@ -66,10 +67,10 @@ rm -rf $RPM_BUILD_ROOT
 %useradd -u 300 -g users -r -s /bin/fafse "celery user" celery
 
 %preun
-/etc/init.d/rc.d/%{module}d stop
+/etc/rc.d/init.d/%{module}d stop
 
 %post
-echo "Use: \"/etc/init.d/rc.d/%{module}d start\" to start celry."
+echo "Use: \"/etc/rc.d/init.d/%{module}d start\" to start celry."
 
 %postun
 %userremove celery
