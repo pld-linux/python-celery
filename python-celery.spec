@@ -8,6 +8,7 @@ License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
 # Source0-md5:	0c8f5ec2535e2aaf692fd0227a5bb407
+Source1:	celeryd.sysconfig
 URL:		-
 BuildRequires:	python-distribute
 BuildRequires:	rpm-pythonprov
@@ -47,21 +48,7 @@ install -p contrib/generic-init.d/celeryd $RPM_BUILD_ROOT/etc/rc.d/init.d
 sed -i 's/default/sysconfig/' $RPM_BUILD_ROOT/etc/rc.d/init.d/celeryd
 
 ## creating dummy celeryd config file
-cat > $RPM_BUILD_ROOT/etc/sysconfig/celeryd << EOF
-#   # List of nodes to start
-#   CELERYD_NODES="worker1 worker2 worker3"k
-#   # ... can also be a number of workers
-#   CELERYD_NODES=3
-#
-#   # Where to chdir at start.
-#   CELERYD_CHDIR="/opt/Myproject/"
-#
-#   # Extra arguments to celeryd
-#   CELERYD_OPTS="--time-limit=300"
-#
-#   # Name of the celery config module.#
-#   CELERY_CONFIG_MODULE="celeryconfig"
-EOF
+cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/celeryd
 
 %py_postclean
 
