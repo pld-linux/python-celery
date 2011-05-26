@@ -1,32 +1,35 @@
 # TODO
 # - pldize initscript
-# - fill descriptions and urls
 %define 	module	celery
 Summary:	Distributed Task Query
 Name:		python-%{module}
 Version:	2.2.6
-Release:	0.3
+Release:	0.4
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
 # Source0-md5:	0c8f5ec2535e2aaf692fd0227a5bb407
 Source1:	celeryd.sysconfig
-URL:		-
+URL:		http://celeryproject.org/
 BuildRequires:	python-distribute
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.228
 Requires:	python-amqplib
-Requires:	python-anyjson
+Requires:	python-anyjson >= 0.3.1
+Requires:	python-dateutil >= 1.5.0
 Requires:	python-dateutil < 2.0.0
-Provides:	user(celery)
 Requires(post,preun):	/sbin/chkconfig
-Requires:	python-kombu
+Requires:	python-kombu >= 1.1.2
 Requires:	python-modules
 Requires:	rc-scripts
+Provides:	user(celery)
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
+Celery is an asynchronous task queue/job queue based on distributed
+message passing. It is focused on real-time operation, but supports
+scheduling as well.
 
 %prep
 %setup -q -n %{module}-%{version}
@@ -79,7 +82,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS README* THANKS TODO
+%doc AUTHORS Changelog FAQ README THANKS TODO
 %attr(755,root,root) %{_bindir}/camqadm
 %attr(755,root,root) %{_bindir}/celerybeat
 %attr(755,root,root) %{_bindir}/celeryctl
