@@ -11,12 +11,14 @@ Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}
 URL:		-
 BuildRequires:	python-distribute
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.219
-Requires:	python-modules
-Requires:	python-kombu
+BuildRequires:	rpmbuild(macros) >= 1.228
+Requires:	python-amqplib
 Requires:	python-anyjson
 Requires:	python-dateutil < 2.0.0
-Requires:	python-amqplib
+Requires(post,preun):	/sbin/chkconfig
+Requires:	python-kombu
+Requires:	python-modules
+Requires:	rc-scripts
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -39,7 +41,7 @@ install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
 install -d $RPM_BUILD_ROOT/etc/{sysconfig,rc.d/init.d}
-cp -a contrib/generic-init.d/celeryd $RPM_BUILD_ROOT/etc/rc.d/init.d/
+install -p contrib/generic-init.d/celeryd $RPM_BUILD_ROOT/etc/rc.d/init.d
 
 ## fixed path to celeryd configuration file.
 sed -i 's/default/sysconfig/' $RPM_BUILD_ROOT/etc/rc.d/init.d/celeryd
@@ -69,14 +71,20 @@ rm -rf $RPM_BUILD_ROOT
 %pre
 %useradd -u 300 -g users -r -s /bin/fafse "celery user" celery
 
-%preun
-/etc/rc.d/init.d/%{module}d stop
-
 %post
-echo "Use: \"/etc/rc.d/init.d/%{module}d start\" to start celry."
+/sbin/chkconfig --add celeryd
+%service celeryd restart
+
+%preun
+if [ "$1" = "0" ]; then
+	%service -q celeryd stop
+	/sbin/chkconfig --del celeryd
+fi
 
 %postun
-%userremove celery
+if [ "$1" = "0" ]; then
+	%userremove celery
+fi
 
 %files
 %defattr(644,root,root,755)
@@ -88,8 +96,8 @@ echo "Use: \"/etc/rc.d/init.d/%{module}d start\" to start celry."
 %attr(755,root,root) %{_bindir}/celeryd-multi
 %attr(755,root,root) %{_bindir}/celeryev
 
-%attr(744,root,root) /etc/rc.d/init.d/*
-%attr(644,root,root) /etc/sysconfig/*
+%attr(754,root,root) /etc/rc.d/init.d/*
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/*
 
 %{py_sitescriptdir}/%{module}
 %if "%{py_ver}" > "2.4"
