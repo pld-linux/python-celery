@@ -1,6 +1,8 @@
+# TODO
+# - pldize initscript
+# - fill descriptions and urls
 %define 	module	celery
 Summary:	Distributed Task Query
-Summary(pl.UTF-8):	-
 Name:		python-%{module}
 Version:	2.2.6
 Release:	0.3
@@ -16,6 +18,7 @@ BuildRequires:	rpmbuild(macros) >= 1.228
 Requires:	python-amqplib
 Requires:	python-anyjson
 Requires:	python-dateutil < 2.0.0
+Provides:	user(celery)
 Requires(post,preun):	/sbin/chkconfig
 Requires:	python-kombu
 Requires:	python-modules
@@ -56,7 +59,8 @@ cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/celeryd
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-%useradd -u 300 -g users -r -s /bin/fafse "celery user" celery
+# XXX uid 300 not registered in PLD-doc/uid_gid.db.txt
+%useradd -u 300 -g users -r -s /bin/false "celery user" celery
 
 %post
 /sbin/chkconfig --add celeryd
@@ -83,8 +87,8 @@ fi
 %attr(755,root,root) %{_bindir}/celeryd-multi
 %attr(755,root,root) %{_bindir}/celeryev
 
-%attr(754,root,root) /etc/rc.d/init.d/*
-%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/*
+%attr(754,root,root) /etc/rc.d/init.d/celeryd
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/celeryd
 
 %{py_sitescriptdir}/%{module}
 %if "%{py_ver}" > "2.4"
