@@ -9,7 +9,8 @@
 #CELERYD_CHDIR="/opt/Myproject/"
 
 # Extra arguments to celeryd
-#CELERYD_OPTS="--time-limit=300"
+CELERYD_OPTS="celeryd -l info -B"
 
 # Name of the celery config module.#
 #CELERY_CONFIG_MODULE="celeryconfig"
+CELERYD=""
