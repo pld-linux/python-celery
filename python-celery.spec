@@ -1,15 +1,16 @@
 # TODO
-# - pldize initscript
+# - better group
 %define 	module	celery
 Summary:	Distributed Task Query
 Name:		python-%{module}
 Version:	2.2.6
-Release:	0.4
+Release:	0.5
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
 # Source0-md5:	0c8f5ec2535e2aaf692fd0227a5bb407
 Source1:	celeryd.sysconfig
+Source2:	celeryd.init
 URL:		http://celeryproject.org/
 BuildRequires:	python-distribute
 BuildRequires:	rpm-pythonprov
@@ -47,14 +48,8 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
-install -d $RPM_BUILD_ROOT/etc/{sysconfig,rc.d/init.d}
-install -p contrib/generic-init.d/celeryd $RPM_BUILD_ROOT/etc/rc.d/init.d
-
-## fixed path to celeryd configuration file.
-sed -i 's/default/sysconfig/' $RPM_BUILD_ROOT/etc/rc.d/init.d/celeryd
-
-## creating dummy celeryd config file
-cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/celeryd
+install -D %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/celeryd
+install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/{sysconfig,rc.d/init.d/celeryd
 
 %py_postclean
 
