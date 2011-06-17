@@ -4,7 +4,7 @@
 Summary:	Distributed Task Query
 Name:		python-%{module}
 Version:	2.2.6
-Release:	0.5
+Release:	0.6
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
@@ -49,7 +49,7 @@ install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
 install -D %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/celeryd
-install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/{sysconfig,rc.d/init.d/celeryd
+install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/celeryd
 
 %py_postclean
 
