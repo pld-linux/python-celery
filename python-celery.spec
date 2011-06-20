@@ -17,7 +17,7 @@ BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.228
 Requires:	python-amqplib
 Requires:	python-anyjson >= 0.3.1
-Requires:	python-dateutil >= 1.5.0
+Requires:	python-dateutil >= 1.5
 Requires:	python-dateutil < 2.0.0
 Requires(post,preun):	/sbin/chkconfig
 Requires:	python-kombu >= 1.1.2
