@@ -3,12 +3,12 @@
 %define 	module	celery
 Summary:	Distributed Task Query
 Name:		python-%{module}
-Version:	2.2.6
+Version:	2.4.4
 Release:	0.6
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
-# Source0-md5:	0c8f5ec2535e2aaf692fd0227a5bb407
+# Source0-md5:	e168bc9856b263edcb0801a04eb9ee9f
 Source1:	celeryd.sysconfig
 Source2:	celeryd.init
 URL:		http://celeryproject.org/
@@ -20,7 +20,7 @@ Requires:	python-anyjson >= 0.3.1
 Requires:	python-dateutil >= 1.5
 Requires:	python-dateutil < 2.0.0
 Requires(post,preun):	/sbin/chkconfig
-Requires:	python-kombu >= 1.1.2
+Requires:	python-kombu >= 1.4.3
 Requires:	python-modules
 Requires:	rc-scripts
 Provides:	user(celery)
@@ -93,6 +93,3 @@ fi
 %{py_sitescriptdir}/celery-*.egg-info
 %endif
 %{_examplesdir}/%{name}-%{version}
-
-# XXX remove?
-%{py_sitescriptdir}/funtests
