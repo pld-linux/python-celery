@@ -1,3 +1,6 @@
+# Define nice level for celeryd
+SERVICE_RUN_NICE_LEVEL="+0"
+
 # Config for celeryd
 
 # List of nodes to start
@@ -5,12 +8,18 @@
 # ... can also be a number of workers
 #CELERYD_NODES=3
 
-# Where to chdir at start.
+# Where to chdir at start
 #CELERYD_CHDIR="/opt/Myproject/"
 
 # Extra arguments to celeryd
-CELERYD_OPTS="celeryd -l info -B"
+CELERYD_OPTS="-B -s /tmp/celerybeat-schedule"
 
-# Name of the celery config module.#
+#CELERYD="$CELERYD_CHDIR/manage.pyc celeryd"
+
+#CELERY_LOADER=
+
+# Name of the celery config module.
 #CELERY_CONFIG_MODULE="celeryconfig"
-CELERYD=""
+#export DJANGO_SETTINGS_MODULE="celeryconfig"
+
+#CELERY_PYTHONPATH=
