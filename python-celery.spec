@@ -3,8 +3,8 @@
 %define 	module	celery
 Summary:	Distributed Task Query
 Name:		python-%{module}
-Version:	2.4.4
-Release:	0.6
+Version:	2.4.6
+Release:	0.3
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
