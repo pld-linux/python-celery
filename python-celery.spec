@@ -8,7 +8,7 @@ Release:	0.3
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
-# Source0-md5:	e168bc9856b263edcb0801a04eb9ee9f
+# Source0-md5:	a480dd8741b0d5ed694b6a36a25a47ce
 Source1:	celeryd.sysconfig
 Source2:	celeryd.init
 URL:		http://celeryproject.org/
@@ -57,8 +57,8 @@ install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/celeryd
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-# XXX uid 300 not registered in PLD-doc/uid_gid.db.txt
-%useradd -u 300 -g users -r -s /bin/false "celery user" celery
+%groupadd -g 274 celery
+%useradd -u 274 -g celery -r -s /bin/false "Celery Daemon" celery
 
 %post
 /sbin/chkconfig --add celeryd
@@ -73,6 +73,7 @@ fi
 %postun
 if [ "$1" = "0" ]; then
 	%userremove celery
+	%groupremove celery
 fi
 
 %files
