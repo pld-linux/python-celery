@@ -1,14 +1,12 @@
-# TODO
-# - better group
 %define 	module	celery
 Summary:	Distributed Task Query
 Name:		python-%{module}
-Version:	2.4.6
+Version:	2.5.1
 Release:	0.3
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
-# Source0-md5:	a480dd8741b0d5ed694b6a36a25a47ce
+# Source0-md5:	c0912f29b69929219b353c748e0bf936
 Source1:	celeryd.sysconfig
 Source2:	celeryd.init
 URL:		http://celeryproject.org/
@@ -20,7 +18,7 @@ Requires:	python-anyjson >= 0.3.1
 Requires:	python-dateutil >= 1.5
 Requires:	python-dateutil < 2.0.0
 Requires(post,preun):	/sbin/chkconfig
-Requires:	python-kombu >= 1.4.3
+Requires:	python-kombu >= 2.1.1
 Requires:	python-modules
 Requires:	rc-scripts
 Provides:	user(celery)
