@@ -27,8 +27,8 @@ DEFAULT_NODES="celery"
 CELERYD_USER=${CELERYD_USER:-"celery"}
 CELERYD_GROUP=${CELERYD_GROUP:-"users"}
 
-CELERYD_LOG_FILE=${CELERYD_LOG_FILE:-${CELERYD_LOGFILE:-"/var/log/celeryd.log"}}
-CELERYD_PID_FILE=${CELERYD_PID_FILE:-${CELERYD_PIDFILE:-"/var/run/celeryd.pid"}}
+CELERYD_LOG_FILE=${CELERYD_LOG_FILE:-${CELERYD_LOGFILE:-"/var/log/celery/%n.log"}}
+CELERYD_PID_FILE=${CELERYD_PID_FILE:-${CELERYD_PIDFILE:-"/var/run/celery/%n.pid"}}
 CELERYD_LOG_LEVEL=${CELERYD_LOG_LEVEL:-${CELERYD_LOGLEVEL:-"INFO"}}
 
 CELERYD=${CELERYD:-"/usr/bin/celeryd"}
@@ -73,9 +73,11 @@ start() {
 
 	msg_starting "celeryd"
 	start-stop-daemon --start $DAEMON_OPTS --background \
-		--make-pidfile --pidfile "$CELERYD_PID_FILE" \
-		--exec $CELERYD -- \
-		--logfile="$CELERYD_LOG_FILE" --loglevel="$CELERYD_LOG_LEVEL" \
+		--exec $CELERYD_MULTI \
+		start $CELERYD_NODES -- \
+		--pidfile="$CELERYD_PID_FILE" \
+		--logfile="$CELERYD_LOG_FILE" \
+		--loglevel="$CELERYD_LOG_LEVEL" \
 		$CELERYD_OPTS
 	ok
 	RETVAL=$?
@@ -89,8 +91,14 @@ stop() {
 	fi
 
 	msg_stopping "celeryd"
-	start-stop-daemon --stop --quiet --pidfile /var/run/celeryd.pid && ok || fail
-	rm -f /var/lock/subsys/celeryd >/dev/null 2>&1
+	$CELERYD_MULTI stop $CELERYD_NODES --pidfile="$CELERYD_PID_FILE" >/dev/null 2>&1
+	RETVAL=$?
+	if [ $RETVAL == 0 ]; then
+		ok
+		rm -f /var/lock/subsys/celeryd >/dev/null 2>&1
+	else
+		fail
+	fi
 }
 
 RETVAL=0
