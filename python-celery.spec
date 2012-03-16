@@ -2,13 +2,14 @@
 Summary:	Distributed Task Query
 Name:		python-%{module}
 Version:	2.5.1
-Release:	0.3
+Release:	0.4
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
 # Source0-md5:	c0912f29b69929219b353c748e0bf936
 Source1:	celeryd.sysconfig
 Source2:	celeryd.init
+Source3:	celery.tmpfiles
 URL:		http://celeryproject.org/
 BuildRequires:	python-distribute
 BuildRequires:	rpm-pythonprov
@@ -43,6 +44,9 @@ rm -rf $RPM_BUILD_ROOT
 	--optimize=2 \
 	--root=$RPM_BUILD_ROOT
 
+install -d $RPM_BUILD_ROOT%{_localstatedir}/run/celery
+install -d $RPM_BUILD_ROOT/var/log{,/archive}/celery
+install -D %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/celery.conf
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
@@ -86,6 +90,10 @@ fi
 
 %attr(754,root,root) /etc/rc.d/init.d/celeryd
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/celeryd
+%attr(750,celery,root) %dir %{_localstatedir}/run/celery
+%attr(750,celery,logs) %dir /var/log/archive/celery
+%attr(750,celery,logs) /var/log/celery
+/usr/lib/tmpfiles.d/celery.conf
 
 %{py_sitescriptdir}/%{module}
 %if "%{py_ver}" > "2.4"
