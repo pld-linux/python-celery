@@ -43,6 +43,14 @@ BuildRequires:	python-mock >= 1.0.1
 BuildRequires:	python-modules >= 1:2.7
 BuildRequires:	python-nose
 %endif
+%if %{with doc}
+BuildRequires:	python-billiard
+BuildRequires:	python-django
+BuildRequires:	python-kombu
+BuildRequires:	python-pytz
+BuildRequires:	python-sphinxcontrib-issuetracker
+BuildRequires:	sphinx-pdg
+%endif
 %endif
 %if %{with python3}
 BuildRequires:	python3-setuptools
