@@ -1,28 +1,58 @@
+
+# TODO:
+#	- consider init script / systemd job (uid/gid celery 274 used to be used)
+#	  NOTE: this must not be included and enabled by default in the default
+#	  package! Real-life deployments will mostly be application-specific.
+
+# Conditional build:
+%bcond_without	doc	# don't build doc
+%bcond_with	tests		# run tests (broken)
+%bcond_without	python2 	# CPython 2.x module
+%bcond_without	python3 	# CPython 3.x module
+%bcond_without	python3_default	# Use Python 3.x for celery executables
+
+%if %{without python3}
+%undefine	python3_default
+%endif
+
 %define 	module	celery
-Summary:	Distributed Task Query
+Summary:	Celery - Distributed Task Query
 Name:		python-%{module}
-Version:	2.5.1
-Release:	0.4
+Version:	3.1.19
+Release:	0.1
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
-# Source0-md5:	c0912f29b69929219b353c748e0bf936
-Source1:	celeryd.sysconfig
-Source2:	celeryd.init
-Source3:	celery.tmpfiles
+# Source0-md5:	fba8c4b269814dc6dbc36abb0e66c384
+Source1:	amqp-objects.inv
+Source2:	cyme-objects.inv
+Source3:	djcelery-objects.inv
+Source4:	kombu-objects.inv
+Source5:	python-objects.inv
+Patch0:		pytz_dependency.patch
+Patch1:		unittest2.patch
+Patch2:		intersphinx.patch
 URL:		http://celeryproject.org/
-BuildRequires:	python-distribute
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.228
-Requires:	python-amqplib
-Requires:	python-anyjson >= 0.3.1
-Requires:	python-dateutil >= 1.5
-Requires:	python-dateutil < 2.0.0
-Requires(post,preun):	/sbin/chkconfig
-Requires:	python-kombu >= 2.1.1
-Requires:	python-modules
-Requires:	rc-scripts
-Provides:	user(celery)
+BuildRequires:	rpmbuild(macros) >= 1.612
+BuildRequires:	sed >= 4.0
+%if %{with python2}
+BuildRequires:	python-setuptools
+%if %{with tests}
+BuildRequires:	python-mock >= 1.0.1
+BuildRequires:	python-modules >= 1:2.7
+BuildRequires:	python-nose
+%endif
+%endif
+%if %{with python3}
+BuildRequires:	python3-setuptools
+%if %{with tests}
+BuildRequires:	python3-nose
+%endif
+%endif
+Requires:	python-billiard >= 3.3.0.21
+Requires:	python-kombu >= 3.0.29
+Requires:	python-pytz
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -31,72 +61,135 @@ Celery is an asynchronous task queue/job queue based on distributed
 message passing. It is focused on real-time operation, but supports
 scheduling as well.
 
+%package -n python3-%{module}
+Summary:	Celery - Distributed Task Query
+Group:		Development/Languages/Python
+Requires:	python3-billiard >= 3.3.0.21
+Requires:	python3-billiard < 3.4
+Requires:	python3-kombu >= 3.0.29
+Requires:	python3-kombu < 3.1
+Requires:	python3-pytz
+
+%description -n python3-%{module}
+Celery is an asynchronous task queue/job queue based on distributed
+message passing. It is focused on real-time operation, but supports
+scheduling as well.
+
+%package -n celery
+Summary:	Celery - Distributed Task Query
+Group:		Development/Languages/Python
+%if %{with python3_default}
+Requires:	python3-%{module} = %{version}
+%else
+Requires:	python-%{module} = %{version}
+%endif
+
+%description -n celery
+Celery is an asynchronous task queue/job queue based on distributed
+message passing. It is focused on real-time operation, but supports
+scheduling as well.
+
+%package apidocs
+Summary:	%{module} API documentation
+Summary(pl.UTF-8):	Dokumentacja API %{module}
+Group:		Documentation
+
+%description apidocs
+API documentation for %{module}.
+
+%description apidocs -l pl.UTF-8
+Dokumentacja API %{module}.
+
 %prep
 %setup -q -n %{module}-%{version}
 
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+
+cp -a %{SOURCE1} %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} docs
+
 %build
-%{__python} setup.py build
+%if %{with python2}
+%{__python} setup.py build --build-base build-2 %{?with_tests:test}
+
+%if %{with doc}
+cd docs
+PYTHONPATH=../build-2/lib %{__make} -j1 html
+rm -rf .build/html/_sources
+cd ..
+%endif
+%endif
+%if %{with python3}
+%{__python3} setup.py build --build-base build-3 %{?with_tests:test}
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__python} setup.py install \
-	--skip-build \
-	--optimize=2 \
-	--root=$RPM_BUILD_ROOT
 
-install -d $RPM_BUILD_ROOT%{_localstatedir}/run/celery
-install -d $RPM_BUILD_ROOT/var/log{,/archive}/celery
-install -D %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/celery.conf
+install_python2() {
+	%{__python} setup.py \
+		build --build-base build-2 \
+		install --skip-build \
+		--optimize=2 \
+		--root=$RPM_BUILD_ROOT
+
+	%py_postclean
+}
+install_python3() {
+	%{__python3} setup.py \
+		build --build-base build-3 \
+		install --skip-build \
+		--optimize=2 \
+		--root=$RPM_BUILD_ROOT
+}
+
+# install the right executables last
+%if %{with python3} && %{without python3_default}
+install_python3
+%endif
+%if %{with python2}
+install_python2
+%endif
+%if %{with python3} && %{with python3_default}
+install_python3
+%endif
+
+%if %{with python2}
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
-
-install -D %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/celeryd
-install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/celeryd
-
-%py_postclean
+find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name '*.py' \
+	| xargs sed -i '1s|^#!.*python\b|#!%{__python}|'
+%endif
+%if %{with python3}
+install -d $RPM_BUILD_ROOT%{_examplesdir}/python3-%{module}-%{version}
+cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/python3-%{module}-%{version}
+find $RPM_BUILD_ROOT%{_examplesdir}/python3-%{module}-%{version} -name '*.py' \
+	| xargs sed -i '1s|^#!.*python\b|#!%{__python3}|'
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%pre
-%groupadd -g 274 celery
-%useradd -u 274 -g celery -r -s /bin/false "Celery Daemon" celery
-
-%post
-/sbin/chkconfig --add celeryd
-%service celeryd restart
-
-%preun
-if [ "$1" = "0" ]; then
-	%service -q celeryd stop
-	/sbin/chkconfig --del celeryd
-fi
-
-%postun
-if [ "$1" = "0" ]; then
-	%userremove celery
-	%groupremove celery
-fi
-
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS Changelog FAQ README THANKS TODO
-%attr(755,root,root) %{_bindir}/camqadm
-%attr(755,root,root) %{_bindir}/celerybeat
-%attr(755,root,root) %{_bindir}/celeryctl
-%attr(755,root,root) %{_bindir}/celeryd
-%attr(755,root,root) %{_bindir}/celeryd-multi
-%attr(755,root,root) %{_bindir}/celeryev
-
-%attr(754,root,root) /etc/rc.d/init.d/celeryd
-%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/celeryd
-%attr(750,celery,root) %dir %{_localstatedir}/run/celery
-%attr(750,celery,logs) %dir /var/log/archive/celery
-%attr(750,celery,logs) /var/log/celery
-/usr/lib/tmpfiles.d/celery.conf
-
+%doc CONTRIBUTORS.txt Changelog LICENSE README.rst TODO extra
 %{py_sitescriptdir}/%{module}
-%if "%{py_ver}" > "2.4"
 %{py_sitescriptdir}/celery-*.egg-info
-%endif
 %{_examplesdir}/%{name}-%{version}
+
+%files -n python3-%{module}
+%defattr(644,root,root,755)
+%doc CONTRIBUTORS.txt Changelog LICENSE README.rst TODO extra
+%{py3_sitescriptdir}/%{module}
+%{py3_sitescriptdir}/celery-*.egg-info
+%{_examplesdir}/python3-%{module}-%{version}
+
+%files -n celery
+%attr(755,root,root) %{_bindir}/*
+
+%if %{with doc}
+%files apidocs
+%defattr(644,root,root,755)
+%doc docs/.build/html/*
+%endif
