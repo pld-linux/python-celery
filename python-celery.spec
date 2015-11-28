@@ -119,7 +119,7 @@ cp -a %{SOURCE1} %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} docs
 
 %build
 %if %{with python2}
-%{__python} setup.py build --build-base build-2 %{?with_tests:test}
+%py_build %{?with_tests:test}
 
 %if %{with doc}
 cd docs
@@ -129,27 +129,19 @@ cd ..
 %endif
 %endif
 %if %{with python3}
-%{__python3} setup.py build --build-base build-3 %{?with_tests:test}
+%py3_build %{?with_tests:test}
 %endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 install_python2() {
-	%{__python} setup.py \
-		build --build-base build-2 \
-		install --skip-build \
-		--optimize=2 \
-		--root=$RPM_BUILD_ROOT
+	%py_install
 
 	%py_postclean
 }
 install_python3() {
-	%{__python3} setup.py \
-		build --build-base build-3 \
-		install --skip-build \
-		--optimize=2 \
-		--root=$RPM_BUILD_ROOT
+	%py3_install
 }
 
 # install the right executables last
