@@ -34,7 +34,7 @@ Patch1:		unittest2.patch
 Patch2:		intersphinx.patch
 URL:		http://celeryproject.org/
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.612
+BuildRequires:	rpmbuild(macros) >= 1.710
 BuildRequires:	sed >= 4.0
 %if %{with python2}
 BuildRequires:	python-setuptools
