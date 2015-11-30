@@ -19,7 +19,7 @@
 Summary:	Celery - Distributed Task Query
 Name:		python-%{module}
 Version:	3.1.19
-Release:	3
+Release:	4
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
@@ -49,13 +49,21 @@ BuildRequires:	python-django
 BuildRequires:	python-kombu
 BuildRequires:	python-pytz
 BuildRequires:	python-sphinxcontrib-issuetracker
-BuildRequires:	sphinx-pdg
+BuildRequires:	sphinx-pdg-2
 %endif
 %endif
 %if %{with python3}
 BuildRequires:	python3-setuptools
 %if %{with tests}
 BuildRequires:	python3-nose
+%endif
+%if %{with doc}
+BuildRequires:	python3-billiard
+BuildRequires:	python3-django
+BuildRequires:	python3-kombu
+BuildRequires:	python3-pytz
+BuildRequires:	python3-sphinxcontrib-issuetracker
+BuildRequires:	sphinx-pdg-3
 %endif
 %endif
 Requires:	python-billiard >= 3.3.0.21
@@ -108,6 +116,17 @@ API documentation for %{module}.
 %description apidocs -l pl.UTF-8
 Dokumentacja API %{module}.
 
+%package -n python3-%{module}-apidocs
+Summary:	%{module} API documentation
+Summary(pl.UTF-8):	Dokumentacja API %{module}
+Group:		Documentation
+
+%description -n python3-%{module}-apidocs
+API documentation for %{module}.
+
+%description -n python3-%{module}-apidocs -l pl.UTF-8
+Dokumentacja API %{module}.
+
 %prep
 %setup -q -n %{module}-%{version}
 
@@ -123,13 +142,22 @@ cp -a %{SOURCE1} %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} docs
 
 %if %{with doc}
 cd docs
-PYTHONPATH=../build-2/lib %{__make} -j1 html
+PYTHONPATH=../build-2/lib %{__make} -j1 html SPHINXBUILD=sphinx-build-2
 rm -rf .build/html/_sources
+mv .build .build2
 cd ..
 %endif
 %endif
 %if %{with python3}
 %py3_build %{?with_tests:test}
+
+%if %{with doc} && 0
+cd docs
+PYTHONPATH=../build-3/lib %{__make} -j1 html SPHINXBUILD=sphinx-build-3
+rm -rf .build/html/_sources
+mv .build .build3
+cd ..
+%endif
 %endif
 
 %install
@@ -171,6 +199,7 @@ find $RPM_BUILD_ROOT%{_examplesdir}/python3-%{module}-%{version} -name '*.py' \
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%if %{with python2}
 %files
 %defattr(644,root,root,755)
 %doc CONTRIBUTORS.txt Changelog LICENSE README.rst TODO extra
@@ -178,6 +207,14 @@ rm -rf $RPM_BUILD_ROOT
 %{py_sitescriptdir}/celery-*.egg-info
 %{_examplesdir}/%{name}-%{version}
 
+%if %{with doc}
+%files apidocs
+%defattr(644,root,root,755)
+%doc docs/.build2/html/*
+%endif
+%endif
+
+%if %{with python3}
 %files -n python3-%{module}
 %defattr(644,root,root,755)
 %doc CONTRIBUTORS.txt Changelog LICENSE README.rst TODO extra
@@ -185,11 +222,12 @@ rm -rf $RPM_BUILD_ROOT
 %{py3_sitescriptdir}/celery-*.egg-info
 %{_examplesdir}/python3-%{module}-%{version}
 
+%if %{with doc} && 0
+%files -n python3-%{module}-apidocs
+%defattr(644,root,root,755)
+%doc docs/.build3/html/*
+%endif
+%endif
+
 %files -n celery
 %attr(755,root,root) %{_bindir}/*
-
-%if %{with doc}
-%files apidocs
-%defattr(644,root,root,755)
-%doc docs/.build/html/*
-%endif
