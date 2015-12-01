@@ -19,7 +19,7 @@
 Summary:	Celery - Distributed Task Query
 Name:		python-%{module}
 Version:	3.1.19
-Release:	4
+Release:	5
 License:	BSD-like
 Group:		Development/Languages/Python
 Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
@@ -32,6 +32,7 @@ Source5:	python-objects.inv
 Patch0:		pytz_dependency.patch
 Patch1:		unittest2.patch
 Patch2:		intersphinx.patch
+Patch3:		python3.5-ordereddict.patch
 URL:		http://celeryproject.org/
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.710
@@ -133,6 +134,7 @@ Dokumentacja API %{module}.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 cp -a %{SOURCE1} %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} docs
 
