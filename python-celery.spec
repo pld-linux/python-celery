@@ -5,7 +5,7 @@
 #	  package! Real-life deployments will mostly be application-specific.
 
 # Conditional build:
-%bcond_without	doc	# don't build doc
+%bcond_with	doc		# do build doc (too much dependencies to be worth the trouble)
 %bcond_with	tests		# run tests (broken)
 %bcond_without	python2 	# CPython 2.x module
 %bcond_without	python3 	# CPython 3.x module
@@ -18,21 +18,18 @@
 %define 	module	celery
 Summary:	Celery - Distributed Task Query
 Name:		python-%{module}
-Version:	3.1.19
-Release:	8
+Version:	4.2.1
+Release:	1
 License:	BSD-like
 Group:		Development/Languages/Python
-Source0:	http://pypi.python.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
-# Source0-md5:	fba8c4b269814dc6dbc36abb0e66c384
+Source0:	https://files.pythonhosted.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
+# Source0-md5:	71397f019700edc97a41ebadf09daf42
 Source1:	amqp-objects.inv
 Source2:	cyme-objects.inv
 Source3:	djcelery-objects.inv
 Source4:	kombu-objects.inv
 Source5:	python-objects.inv
 Patch0:		pytz_dependency.patch
-Patch1:		unittest2.patch
-Patch2:		intersphinx.patch
-Patch3:		python3.5-ordereddict.patch
 URL:		http://celeryproject.org/
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.710
@@ -67,8 +64,8 @@ BuildRequires:	python3-sphinxcontrib-issuetracker
 BuildRequires:	sphinx-pdg-3
 %endif
 %endif
-Requires:	python-billiard >= 3.3.0.21
-Requires:	python-kombu >= 3.0.29
+Requires:	python-billiard >= 3.5.0.2
+Requires:	python-kombu >= 4.2.0
 Requires:	python-pytz
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -81,10 +78,10 @@ scheduling as well.
 %package -n python3-%{module}
 Summary:	Celery - Distributed Task Query
 Group:		Development/Languages/Python
-Requires:	python3-billiard >= 3.3.0.21
-Requires:	python3-billiard < 3.4
-Requires:	python3-kombu >= 3.0.29
-Requires:	python3-kombu < 3.1
+Requires:	python3-billiard >= 3.5.0.2
+Requires:	python3-billiard < 4.0
+Requires:	python3-kombu >= 4.2.0
+Requires:	python3-kombu < 5.0
 Requires:	python3-pytz
 
 %description -n python3-%{module}
@@ -132,11 +129,15 @@ Dokumentacja API %{module}.
 %setup -q -n %{module}-%{version}
 
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
 
 cp -a %{SOURCE1} %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} docs
+
+# python 3.7 fix
+cd celery/backends
+mv async.py asynchronous.py
+sed -i 's/async/asynchronous/g' redis.py
+sed -i 's/async/asynchronous/g' rpc.py
+cd ../..
 
 %build
 %if %{with python2}
