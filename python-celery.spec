@@ -18,12 +18,13 @@
 %define 	module	celery
 Summary:	Celery - Distributed Task Query
 Name:		python-%{module}
-Version:	4.2.1
-Release:	2
+Version:	4.4.0
+Release:	1
 License:	BSD-like
 Group:		Development/Languages/Python
-Source0:	https://files.pythonhosted.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
-# Source0-md5:	71397f019700edc97a41ebadf09daf42
+# Source0:	https://files.pythonhosted.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
+Source0:	https://pypi.debian.net/%{module}/%{module}-%{version}.tar.gz
+# Source0-md5:	9c5d17291bf204662ecc972eec26789e
 Source1:	amqp-objects.inv
 Source2:	cyme-objects.inv
 Source3:	djcelery-objects.inv
@@ -132,13 +133,6 @@ Dokumentacja API %{module}.
 
 cp -a %{SOURCE1} %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} docs
 
-# python 3.7 fix
-cd celery/backends
-mv async.py asynchronous.py
-sed -i 's/async/asynchronous/g' redis.py
-sed -i 's/async/asynchronous/g' rpc.py
-cd ../..
-
 %build
 %if %{with python2}
 %py_build %{?with_tests:test}
@@ -205,7 +199,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python2}
 %files
 %defattr(644,root,root,755)
-%doc CONTRIBUTORS.txt Changelog LICENSE README.rst TODO extra
+%doc CONTRIBUTORS.txt LICENSE README.rst TODO extra
 %{py_sitescriptdir}/%{module}
 %{py_sitescriptdir}/celery-*.egg-info
 %{_examplesdir}/%{name}-%{version}
@@ -220,7 +214,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python3}
 %files -n python3-%{module}
 %defattr(644,root,root,755)
-%doc CONTRIBUTORS.txt Changelog LICENSE README.rst TODO extra
+%doc CONTRIBUTORS.txt LICENSE README.rst TODO extra
 %{py3_sitescriptdir}/%{module}
 %{py3_sitescriptdir}/celery-*.egg-info
 %{_examplesdir}/python3-%{module}-%{version}
