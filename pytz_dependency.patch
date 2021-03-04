@@ -1,8 +1,9 @@
-diff -dur celery-3.1.19.orig/requirements/default.txt celery-3.1.19/requirements/default.txt
---- celery-3.1.19.orig/requirements/default.txt	2015-10-26 21:04:39.000000000 +0100
-+++ celery-3.1.19/requirements/default.txt	2015-11-16 15:15:38.000000000 +0100
-@@ -1,3 +1,3 @@
+diff -urNp -x '*.orig' celery-4.4.0.org/requirements/default.txt celery-4.4.0/requirements/default.txt
+--- celery-4.4.0.org/requirements/default.txt	2019-12-07 15:50:53.000000000 +0100
++++ celery-4.4.0/requirements/default.txt	2021-03-04 20:40:36.563745980 +0100
+@@ -1,4 +1,4 @@
 -pytz>dev
 +pytz
- billiard>=3.3.0.21,<3.4
- kombu>=3.0.29,<3.1
+ billiard>=3.6.1,<4.0
+ kombu>=4.6.7,<4.7
+ vine==1.3.0
