@@ -19,7 +19,7 @@
 Summary:	Celery - Distributed Task Query
 Name:		python-%{module}
 Version:	4.4.0
-Release:	1
+Release:	2
 License:	BSD-like
 Group:		Development/Languages/Python
 # Source0:	https://files.pythonhosted.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
