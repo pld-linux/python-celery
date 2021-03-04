@@ -8,8 +8,8 @@
 %bcond_with	doc		# do build doc (too much dependencies to be worth the trouble)
 %bcond_with	tests		# run tests (broken)
 %bcond_without	python2 	# CPython 2.x module
-%bcond_without	python3 	# CPython 3.x module
-%bcond_without	python3_default	# Use Python 3.x for celery executables
+%bcond_with	python3 	# CPython 3.x module
+%bcond_with	python3_default	# Use Python 3.x for celery executables
 
 %if %{without python3}
 %undefine	python3_default
@@ -18,8 +18,9 @@
 %define 	module	celery
 Summary:	Celery - Distributed Task Query
 Name:		python-%{module}
+# keep python 2 version 4.x here; python3 in python3-celery.spec
 Version:	4.4.0
-Release:	2
+Release:	3
 License:	BSD-like
 Group:		Development/Languages/Python
 # Source0:	https://files.pythonhosted.org/packages/source/c/%{module}/%{module}-%{version}.tar.gz
